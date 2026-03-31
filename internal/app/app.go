@@ -9,7 +9,10 @@ import (
 	"time"
 
 	"github.com/solumD/ozon-grapql-service/config"
-	deliveryhttp "github.com/solumD/ozon-grapql-service/internal/delivery/http"
+	graphql "github.com/solumD/ozon-grapql-service/internal/delivery/graphql"
+	"github.com/solumD/ozon-grapql-service/internal/delivery/router"
+	"github.com/solumD/ozon-grapql-service/internal/repository/memory"
+	"github.com/solumD/ozon-grapql-service/internal/usecase"
 	httpserver "github.com/solumD/ozon-grapql-service/pkg/http_server"
 	"github.com/solumD/ozon-grapql-service/pkg/logger"
 	pg "github.com/solumD/ozon-grapql-service/pkg/postgres"
@@ -36,7 +39,18 @@ func InitAndRun(ctx context.Context) {
 		logg.Info("connected to postgres")
 	}
 
-	router := deliveryhttp.NewRouter(ctx)
+	storage := memory.NewStorage()
+	postRepository := memory.NewPostRepository(storage)
+	commentRepository := memory.NewCommentRepository(storage)
+
+	postUsecase := usecase.NewPostUsecase(postRepository)
+	commentUsecase := usecase.NewCommentUsecase(postRepository, commentRepository)
+
+	resolver := graphql.NewResolver(postUsecase, commentUsecase)
+
+	router := router.NewRouter()
+	graphql.RegisterRoutes(router, resolver, cfg.PlaygroundEnabled)
+
 	server := httpserver.New(cfg.ServerAddr(), router)
 	server.Run()
 

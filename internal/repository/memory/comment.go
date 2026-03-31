@@ -25,12 +25,13 @@ func (r *CommentRepository) Create(_ context.Context, comment model.Comment) (mo
 	r.storage.nextCommentID++
 
 	created := model.Comment{
-		ID:        r.storage.nextCommentID,
-		UserUUID:  comment.UserUUID,
-		PostID:    comment.PostID,
-		ParentID:  utils.CloneInt64Ptr(comment.ParentID),
-		Content:   comment.Content,
-		CreatedAt: time.Now().UTC(),
+		ID:         r.storage.nextCommentID,
+		UserUUID:   comment.UserUUID,
+		PostID:     comment.PostID,
+		ParentID:   utils.CloneInt64Ptr(comment.ParentID),
+		HasReplies: false,
+		Content:    comment.Content,
+		CreatedAt:  time.Now().UTC(),
 	}
 
 	r.storage.comments[created.ID] = created
@@ -51,6 +52,7 @@ func (r *CommentRepository) GetByID(_ context.Context, id int64) (model.Comment,
 	}
 
 	comment.ParentID = utils.CloneInt64Ptr(comment.ParentID)
+	comment.HasReplies = r.hasReplies(comment.PostID, comment.ID)
 
 	return comment, nil
 }
@@ -70,6 +72,7 @@ func (r *CommentRepository) ListByPostAndParent(_ context.Context, filter model.
 		}
 
 		comment.ParentID = utils.CloneInt64Ptr(comment.ParentID)
+		comment.HasReplies = r.hasReplies(comment.PostID, comment.ID)
 
 		comments = append(comments, comment)
 	}
@@ -112,4 +115,11 @@ func (r *CommentRepository) ListByPostAndParent(_ context.Context, filter model.
 	}
 
 	return comments[startIdx:endIdx], hasNextPage, nil
+}
+
+func (r *CommentRepository) hasReplies(postID, commentID int64) bool {
+	key := r.storage.makeCommentBucketKey(postID, &commentID)
+	children := r.storage.commentsByBucket[key]
+
+	return len(children) > 0
 }

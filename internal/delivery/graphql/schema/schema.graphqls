@@ -1,0 +1,47 @@
+scalar Time
+
+type Query {
+  posts: [Post!]!
+  post(id: Int!): Post
+  comments(postID: Int!, parentID: Int, first: Int = 20, after: String): CommentConnection!
+}
+
+type Mutation {
+  createPost(userUUID: String!, title: String!, content: String!, commentsEnabled: Boolean!): Post!
+  changePostCommentsAvailability(postID: Int!, enabled: Boolean!): Post!
+  createComment(userUUID: String!, postID: Int!, parentID: Int, content: String!): Comment!
+}
+
+type Post {
+  id: Int!
+  userUUID: String!
+  title: String!
+  content: String!
+  commentsEnabled: Boolean!
+  createdAt: Time!
+}
+
+type Comment {
+  id: Int!
+  userUUID: String!
+  postID: Int!
+  parentID: Int
+  hasReplies: Boolean!
+  content: String!
+  createdAt: Time!
+}
+
+type CommentEdge {
+  cursor: String!
+  node: Comment!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  endCursor: String
+}
+
+type CommentConnection {
+  edges: [CommentEdge!]!
+  pageInfo: PageInfo!
+}
