@@ -33,12 +33,3 @@ func (s *Storage) makeCommentBucketKey(postID int64, parentID *int64) string {
 
 	return fmt.Sprintf("%d:%d", postID, *parentID)
 }
-
-func cloneInt64Ptr(value *int64) *int64 {
-	if value == nil {
-		return nil
-	}
-
-	cloned := *value
-	return &cloned
-}

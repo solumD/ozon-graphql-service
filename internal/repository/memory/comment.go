@@ -5,7 +5,9 @@ import (
 	"sort"
 	"time"
 
+	coreerrors "github.com/solumD/ozon-grapql-service/internal/core_errors"
 	"github.com/solumD/ozon-grapql-service/internal/model"
+	"github.com/solumD/ozon-grapql-service/internal/utils"
 )
 
 type CommentRepository struct {
@@ -26,7 +28,7 @@ func (r *CommentRepository) Create(_ context.Context, comment model.Comment) (mo
 		ID:        r.storage.nextCommentID,
 		UserUUID:  comment.UserUUID,
 		PostID:    comment.PostID,
-		ParentID:  cloneInt64Ptr(comment.ParentID),
+		ParentID:  utils.CloneInt64Ptr(comment.ParentID),
 		Content:   comment.Content,
 		CreatedAt: time.Now().UTC(),
 	}
@@ -45,10 +47,10 @@ func (r *CommentRepository) GetByID(_ context.Context, id int64) (model.Comment,
 
 	comment, ok := r.storage.comments[id]
 	if !ok {
-		return model.Comment{}, model.ErrCommentNotFound
+		return model.Comment{}, coreerrors.ErrCommentNotFound
 	}
 
-	comment.ParentID = cloneInt64Ptr(comment.ParentID)
+	comment.ParentID = utils.CloneInt64Ptr(comment.ParentID)
 
 	return comment, nil
 }
@@ -67,7 +69,7 @@ func (r *CommentRepository) ListByPostAndParent(_ context.Context, filter model.
 			continue
 		}
 
-		comment.ParentID = cloneInt64Ptr(comment.ParentID)
+		comment.ParentID = utils.CloneInt64Ptr(comment.ParentID)
 
 		comments = append(comments, comment)
 	}

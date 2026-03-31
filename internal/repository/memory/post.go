@@ -5,6 +5,7 @@ import (
 	"sort"
 	"time"
 
+	coreerrors "github.com/solumD/ozon-grapql-service/internal/core_errors"
 	"github.com/solumD/ozon-grapql-service/internal/model"
 )
 
@@ -42,7 +43,7 @@ func (r *PostRepository) GetByID(_ context.Context, id int64) (model.Post, error
 
 	post, ok := r.storage.posts[id]
 	if !ok {
-		return model.Post{}, model.ErrPostNotFound
+		return model.Post{}, coreerrors.ErrPostNotFound
 	}
 
 	return post, nil
@@ -74,7 +75,7 @@ func (r *PostRepository) UpdateCommentsAvailability(_ context.Context, postID in
 
 	post, ok := r.storage.posts[postID]
 	if !ok {
-		return model.Post{}, model.ErrPostNotFound
+		return model.Post{}, coreerrors.ErrPostNotFound
 	}
 
 	post.CommentsEnabled = enabled
