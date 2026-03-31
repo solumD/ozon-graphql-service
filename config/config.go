@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"github.com/caarlos0/env/v11"
+	"github.com/joho/godotenv"
 )
 
 const (
@@ -23,19 +24,21 @@ type Config struct {
 }
 
 func MustLoad() *Config {
+	godotenv.Load()
+
 	cfg := &Config{}
 	if err := env.Parse(cfg); err != nil {
 		log.Fatalf("failed to parse config: %v", err)
 	}
 
-	if err := cfg.Validate(); err != nil {
+	if err := cfg.validate(); err != nil {
 		log.Fatalf("failed to validate config: %v", err)
 	}
 
 	return cfg
 }
 
-func (cfg *Config) Validate() error {
+func (cfg *Config) validate() error {
 	switch cfg.StorageType {
 	case StorageTypeMemory:
 		return nil

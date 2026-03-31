@@ -42,13 +42,12 @@ func InitAndRun(ctx context.Context) {
 	storage := memory.NewStorage()
 	postRepository := memory.NewPostRepository(storage)
 	commentRepository := memory.NewCommentRepository(storage)
-
 	postUsecase := usecase.NewPostUsecase(postRepository)
 	commentUsecase := usecase.NewCommentUsecase(postRepository, commentRepository)
-
 	resolver := graphql.NewResolver(postUsecase, commentUsecase)
 
 	router := router.NewRouter()
+
 	graphql.RegisterRoutes(router, resolver, cfg.PlaygroundEnabled)
 
 	server := httpserver.New(cfg.ServerAddr(), router)

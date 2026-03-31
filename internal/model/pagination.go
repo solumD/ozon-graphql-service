@@ -3,7 +3,7 @@ package model
 import "time"
 
 const (
-	DefaultCommentsPageSize = 10
+	DefaultCommentsPageSize = 20
 	MaxCommentsPageSize     = 100
 	MaxCommentLength        = 2000
 )
