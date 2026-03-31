@@ -1,0 +1,64 @@
+package postgres
+
+import (
+	"context"
+	"log"
+	"time"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+)
+
+const (
+	maxPoolSize  = 5
+	connAttempts = 10
+	connTimeout  = 2 * time.Second
+)
+
+type Postgres struct {
+	maxPoolSize  int
+	connAttempts int
+	connTimeout  time.Duration
+	pool         *pgxpool.Pool
+}
+
+func New(dsn string) *Postgres {
+	pg := &Postgres{
+		maxPoolSize:  maxPoolSize,
+		connAttempts: connAttempts,
+		connTimeout:  connTimeout,
+	}
+
+	poolConfig, err := pgxpool.ParseConfig(dsn)
+	if err != nil {
+		log.Fatalf("failed to parse postgres config: %v", err)
+	}
+
+	poolConfig.MaxConns = int32(pg.maxPoolSize)
+
+	for attemptsLeft := pg.connAttempts; attemptsLeft > 0; attemptsLeft-- {
+		pg.pool, err = pgxpool.NewWithConfig(context.Background(), poolConfig)
+		if err == nil {
+			return pg
+		}
+
+		log.Printf("failed to connect to database, attempts left: %d", attemptsLeft-1)
+		time.Sleep(pg.connTimeout)
+	}
+
+	log.Fatalf("failed to connect to database: %v", err)
+	return nil
+}
+
+func (pg *Postgres) Ping(ctx context.Context) error {
+	return pg.pool.Ping(ctx)
+}
+
+func (pg *Postgres) Pool() *pgxpool.Pool {
+	return pg.pool
+}
+
+func (pg *Postgres) Close() {
+	if pg.pool != nil {
+		pg.pool.Close()
+	}
+}
