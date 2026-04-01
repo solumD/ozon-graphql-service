@@ -11,42 +11,69 @@ import (
 	"github.com/solumD/ozon-grapql-service/internal/model"
 	"github.com/solumD/ozon-grapql-service/internal/usecase"
 	"github.com/solumD/ozon-grapql-service/internal/utils"
+	"github.com/solumD/ozon-grapql-service/pkg/logger"
 )
 
 // CreatePost is the resolver for the createPost field.
 func (r *mutationResolver) CreatePost(ctx context.Context, userUUID string, title string, content string, commentsEnabled bool) (*generated.Post, error) {
+	fn := utils.GetCurrentFunctionName()
+	log := r.log.With(logger.String("fn", fn))
+
 	post, err := r.postUsecase.CreatePost(ctx, userUUID, title, content, commentsEnabled)
 	if err != nil {
+		log.Error("failed to create post", logger.Error(err))
+
 		return nil, err
 	}
+
+	log.Info("post resolved", logger.Int64("post_id", post.ID))
 
 	return toGraphQLPost(post), nil
 }
 
 // ChangePostCommentsAvailability is the resolver for the changePostCommentsAvailability field.
 func (r *mutationResolver) ChangePostCommentsAvailability(ctx context.Context, postID int, enabled bool) (*generated.Post, error) {
+	fn := utils.GetCurrentFunctionName()
+	log := r.log.With(logger.String("fn", fn))
+
 	post, err := r.postUsecase.ChangeCommentsAvailability(ctx, int64(postID), enabled)
 	if err != nil {
+		log.Error("failed to change comments availability", logger.Error(err), logger.Int64("post_id", int64(postID)))
+
 		return nil, err
 	}
+
+	log.Info("comments availability resolved", logger.Int64("post_id", int64(postID)), logger.Any("enabled", enabled))
 
 	return toGraphQLPost(post), nil
 }
 
 // CreateComment is the resolver for the createComment field.
 func (r *mutationResolver) CreateComment(ctx context.Context, userUUID string, postID int, parentID *int, content string) (*generated.Comment, error) {
+	fn := utils.GetCurrentFunctionName()
+	log := r.log.With(logger.String("fn", fn))
+
 	comment, err := r.commentUsecase.CreateComment(ctx, userUUID, int64(postID), utils.ToInt64Ptr(parentID), content)
 	if err != nil {
+		log.Error("failed to create comment", logger.Error(err), logger.Int64("post_id", int64(postID)))
+
 		return nil, err
 	}
+
+	log.Info("comment resolved", logger.Int64("comment_id", comment.ID), logger.Int64("post_id", comment.PostID))
 
 	return toGraphQLComment(comment), nil
 }
 
 // Posts is the resolver for the posts field.
 func (r *queryResolver) Posts(ctx context.Context) ([]*generated.Post, error) {
+	fn := utils.GetCurrentFunctionName()
+	log := r.log.With(logger.String("fn", fn))
+
 	posts, err := r.postUsecase.ListPosts(ctx)
 	if err != nil {
+		log.Error("failed to list posts", logger.Error(err))
+
 		return nil, err
 	}
 
@@ -55,21 +82,32 @@ func (r *queryResolver) Posts(ctx context.Context) ([]*generated.Post, error) {
 		result = append(result, toGraphQLPost(post))
 	}
 
+	log.Info("posts resolved", logger.Int64("count", int64(len(result))))
+
 	return result, nil
 }
 
 // Post is the resolver for the post field.
 func (r *queryResolver) Post(ctx context.Context, id int) (*generated.Post, error) {
+	fn := utils.GetCurrentFunctionName()
+	log := r.log.With(logger.String("fn", fn))
+
 	post, err := r.postUsecase.GetPost(ctx, int64(id))
 	if err != nil {
+		log.Error("failed to get post", logger.Error(err), logger.Int64("post_id", int64(id)))
 		return nil, err
 	}
+
+	log.Info("post resolved", logger.Int64("post_id", int64(id)))
 
 	return toGraphQLPost(post), nil
 }
 
 // Comments is the resolver for the comments field.
 func (r *queryResolver) Comments(ctx context.Context, postID int, parentID *int, first *int, after *string) (*generated.CommentConnection, error) {
+	fn := utils.GetCurrentFunctionName()
+	log := r.log.With(logger.String("fn", fn))
+
 	filter := model.CommentListFilter{
 		PostID:   int64(postID),
 		ParentID: utils.ToInt64Ptr(parentID),
@@ -82,6 +120,7 @@ func (r *queryResolver) Comments(ctx context.Context, postID int, parentID *int,
 	if after != nil && *after != "" {
 		cursor, err := usecase.DecodeCursor(*after)
 		if err != nil {
+			log.Error("failed to decode cursor", logger.Error(err))
 			return nil, err
 		}
 		filter.After = &cursor
@@ -89,8 +128,12 @@ func (r *queryResolver) Comments(ctx context.Context, postID int, parentID *int,
 
 	connection, err := r.commentUsecase.ListComments(ctx, filter)
 	if err != nil {
+		log.Error("failed to list comments", logger.Error(err), logger.Int64("post_id", int64(postID)))
+
 		return nil, err
 	}
+
+	log.Info("comments resolved", logger.Int64("post_id", int64(postID)), logger.Int64("count", int64(len(connection.Edges))))
 
 	return toGraphQLCommentConnection(connection), nil
 }

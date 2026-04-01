@@ -1,6 +1,7 @@
 package graphql
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -12,12 +13,14 @@ import (
 type Resolver struct {
 	postUsecase    PostUsecase
 	commentUsecase CommentUsecase
+	log            *slog.Logger
 }
 
-func NewResolver(postUsecase PostUsecase, commentUsecase CommentUsecase) *Resolver {
+func NewResolver(postUsecase PostUsecase, commentUsecase CommentUsecase, log *slog.Logger) *Resolver {
 	return &Resolver{
 		postUsecase:    postUsecase,
 		commentUsecase: commentUsecase,
+		log:            log,
 	}
 }
 

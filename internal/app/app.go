@@ -27,8 +27,10 @@ func InitAndRun(ctx context.Context) {
 
 	cfg := config.MustLoad()
 
-	logg := logger.NewLogger(cfg.LoggerLevel)
-	logg.Info("configuration loaded", logger.Any("storage_type", cfg.StorageType))
+	lg := logger.NewLogger(cfg.LoggerLevel)
+	lg.Debug("debug messages are enabled")
+
+	lg.Info("configuration loaded", logger.Any("storage_type", cfg.StorageType))
 
 	var (
 		postRepository    usecase.PostRepository
@@ -42,19 +44,19 @@ func InitAndRun(ctx context.Context) {
 		}
 		defer postgresConn.Close()
 
-		logg.Info("connected to postgres")
+		lg.Info("connected to postgres")
 
-		postRepository = pgrepo.NewPostRepository(postgresConn)
-		commentRepository = pgrepo.NewCommentRepository(postgresConn)
+		postRepository = pgrepo.NewPostRepository(postgresConn, lg)
+		commentRepository = pgrepo.NewCommentRepository(postgresConn, lg)
 	} else {
 		storage := memory.NewStorage()
-		postRepository = memory.NewPostRepository(storage)
-		commentRepository = memory.NewCommentRepository(storage)
+		postRepository = memory.NewPostRepository(storage, lg)
+		commentRepository = memory.NewCommentRepository(storage, lg)
 	}
 
-	postUsecase := usecase.NewPostUsecase(postRepository)
-	commentUsecase := usecase.NewCommentUsecase(postRepository, commentRepository)
-	resolver := graphql.NewResolver(postUsecase, commentUsecase)
+	postUsecase := usecase.NewPostUsecase(postRepository, lg)
+	commentUsecase := usecase.NewCommentUsecase(postRepository, commentRepository, lg)
+	resolver := graphql.NewResolver(postUsecase, commentUsecase, lg)
 
 	router := router.NewRouter()
 
@@ -63,20 +65,20 @@ func InitAndRun(ctx context.Context) {
 	server := httpserver.New(cfg.ServerAddr(), router)
 	server.Run()
 
-	logg.Info("server started", logger.String("addr", cfg.ServerAddr()))
+	lg.Info("server started", logger.String("addr", cfg.ServerAddr()))
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 	<-interrupt
 
-	logg.Info("shutting down server")
+	lg.Info("shutting down server")
 
 	shutdownCtx, cancelShutdownCtx := context.WithTimeout(context.Background(), shutdownTimeout)
 	defer cancelShutdownCtx()
 
 	if err := server.Shutdown(shutdownCtx); err != nil {
-		logg.Error("error while shutting down server", logger.Error(err))
+		lg.Error("error while shutting down server", logger.Error(err))
 	}
 
-	logg.Info("server stopped")
+	lg.Info("server stopped")
 }

@@ -2,23 +2,29 @@ package memory
 
 import (
 	"context"
+	"log/slog"
 	"sort"
 	"time"
 
 	coreerrors "github.com/solumD/ozon-grapql-service/internal/core_errors"
 	"github.com/solumD/ozon-grapql-service/internal/model"
 	"github.com/solumD/ozon-grapql-service/internal/utils"
+	"github.com/solumD/ozon-grapql-service/pkg/logger"
 )
 
 type CommentRepository struct {
 	storage *Storage
+	log     *slog.Logger
 }
 
-func NewCommentRepository(storage *Storage) *CommentRepository {
-	return &CommentRepository{storage: storage}
+func NewCommentRepository(storage *Storage, log *slog.Logger) *CommentRepository {
+	return &CommentRepository{storage: storage, log: log}
 }
 
 func (r *CommentRepository) Create(_ context.Context, comment model.Comment) (model.Comment, error) {
+	fn := utils.GetCurrentFunctionName()
+	log := r.log.With(logger.String("fn", fn))
+
 	r.storage.mu.Lock()
 	defer r.storage.mu.Unlock()
 
@@ -39,25 +45,37 @@ func (r *CommentRepository) Create(_ context.Context, comment model.Comment) (mo
 	key := r.storage.makeCommentBucketKey(created.PostID, created.ParentID)
 	r.storage.commentsByBucket[key] = append(r.storage.commentsByBucket[key], created.ID)
 
+	log.Info("comment created", logger.Int64("comment_id", created.ID), logger.Int64("post_id", created.PostID))
+
 	return created, nil
 }
 
 func (r *CommentRepository) GetByID(_ context.Context, id int64) (model.Comment, error) {
+	fn := utils.GetCurrentFunctionName()
+	log := r.log.With(logger.String("fn", fn))
+
 	r.storage.mu.RLock()
 	defer r.storage.mu.RUnlock()
 
 	comment, ok := r.storage.comments[id]
 	if !ok {
+		log.Warn("comment not found", logger.Int64("comment_id", id))
+
 		return model.Comment{}, coreerrors.ErrCommentNotFound
 	}
 
 	comment.ParentID = utils.CloneInt64Ptr(comment.ParentID)
 	comment.HasReplies = r.hasReplies(comment.PostID, comment.ID)
 
+	log.Info("comment retrieved", logger.Int64("comment_id", id))
+
 	return comment, nil
 }
 
 func (r *CommentRepository) ListByPostAndParent(_ context.Context, filter model.CommentListFilter) ([]model.Comment, bool, error) {
+	fn := utils.GetCurrentFunctionName()
+	log := r.log.With(logger.String("fn", fn))
+
 	r.storage.mu.RLock()
 	defer r.storage.mu.RUnlock()
 
@@ -113,6 +131,8 @@ func (r *CommentRepository) ListByPostAndParent(_ context.Context, filter model.
 	if endIdx > len(comments) {
 		endIdx = len(comments)
 	}
+
+	log.Info("comments listed", logger.Int64("post_id", filter.PostID), logger.Int64("count", int64(endIdx-startIdx)), logger.Any("has_next_page", hasNextPage))
 
 	return comments[startIdx:endIdx], hasNextPage, nil
 }
