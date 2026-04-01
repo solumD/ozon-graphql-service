@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE IF NOT EXISTS posts (
     id BIGSERIAL PRIMARY KEY,
     user_uuid TEXT NOT NULL,
@@ -20,3 +21,7 @@ CREATE INDEX IF NOT EXISTS idx_comments_post_id ON comments(post_id);
 CREATE INDEX IF NOT EXISTS idx_comments_parent_id ON comments(parent_id);
 CREATE INDEX IF NOT EXISTS idx_comments_post_parent_created_id
     ON comments(post_id, parent_id, created_at, id);
+
+-- +goose Down
+DROP TABLE IF EXISTS comments;
+DROP TABLE IF EXISTS posts;
