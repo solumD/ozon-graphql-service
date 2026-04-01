@@ -1,6 +1,6 @@
-// This file is hand-written.
-// It stays in package generated because gqlgen generated code references
-// executionContext methods defined here for the custom Time scalar.
+// Этот файл написан вручную.
+// Он находится в пакете generated, потому что сгенерированный gqlgen-код
+// использует методы executionContext, определённые здесь, для кастомного scalar Time.
 package generated
 
 import (

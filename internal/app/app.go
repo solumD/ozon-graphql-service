@@ -12,6 +12,7 @@ import (
 	graphql "github.com/solumD/ozon-grapql-service/internal/delivery/graphql"
 	"github.com/solumD/ozon-grapql-service/internal/delivery/router"
 	"github.com/solumD/ozon-grapql-service/internal/repository/memory"
+	pgrepo "github.com/solumD/ozon-grapql-service/internal/repository/postgres"
 	"github.com/solumD/ozon-grapql-service/internal/usecase"
 	httpserver "github.com/solumD/ozon-grapql-service/pkg/http_server"
 	"github.com/solumD/ozon-grapql-service/pkg/logger"
@@ -29,6 +30,11 @@ func InitAndRun(ctx context.Context) {
 	logg := logger.NewLogger(cfg.LoggerLevel)
 	logg.Info("configuration loaded", logger.Any("storage_type", cfg.StorageType))
 
+	var (
+		postRepository    usecase.PostRepository
+		commentRepository usecase.CommentRepository
+	)
+
 	if cfg.StorageType == config.StorageTypePostgres {
 		postgresConn := pg.New(cfg.PostgresDSN)
 		if err := postgresConn.Ping(ctx); err != nil {
@@ -37,11 +43,15 @@ func InitAndRun(ctx context.Context) {
 		defer postgresConn.Close()
 
 		logg.Info("connected to postgres")
+
+		postRepository = pgrepo.NewPostRepository(postgresConn)
+		commentRepository = pgrepo.NewCommentRepository(postgresConn)
+	} else {
+		storage := memory.NewStorage()
+		postRepository = memory.NewPostRepository(storage)
+		commentRepository = memory.NewCommentRepository(storage)
 	}
 
-	storage := memory.NewStorage()
-	postRepository := memory.NewPostRepository(storage)
-	commentRepository := memory.NewCommentRepository(storage)
 	postUsecase := usecase.NewPostUsecase(postRepository)
 	commentUsecase := usecase.NewCommentUsecase(postRepository, commentRepository)
 	resolver := graphql.NewResolver(postUsecase, commentUsecase)
