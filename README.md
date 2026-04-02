@@ -16,6 +16,7 @@ go mod tidy
 - Для GraphQL subscriptions реализован отдельный in-memory broker комментариев, через который новые комментарии доставляются подписанным клиентам асинхронно.
 - Для слоёв `usecase` и `delivery` написаны unit-тесты, моки сгенерированы с использованием `minimock`.
 - Миграции накатываются с помощью утилиты `goose`.
+- В качестве логгера используется `slog`.
 
 
 ### Запуск
@@ -341,7 +342,7 @@ query {
 }
 ```
 
-#### 8. Отключение комментариев для поста
+#### 8. Отключение/включение комментариев у поста
 ```graphql
 mutation {
   changePostCommentsAvailability(postID: 1, enabled: false) {
@@ -433,14 +434,15 @@ subscription {
 │   │   ├── mock
 │   │   └── tests
 │   └── utils
-├── Makefile
 ├── migrations
 ├── pkg
 │   ├── http_server
 │   ├── logger
 │   └── postgres
+├── .env.example
 ├── docker-compose.yaml
 ├── Dockerfile
+├── Makefile
 ├── go.mod
 ├── go.sum
 └── README.md
