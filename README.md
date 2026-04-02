@@ -25,7 +25,7 @@ go mod tidy
 #### Запуск с PostgreSQL
 Перед запуском указать значения переменных:
 - `STORAGE_TYPE=postgres`
-- `PG_DSN=host={строка_подключения}`
+- `PG_DSN=host=pg port=5432 dbname=... user=... password=... sslmode=disable`
 
 Команда:
 ```
