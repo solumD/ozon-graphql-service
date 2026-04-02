@@ -33,6 +33,16 @@ Unit-тесты написаны для базового функционала 
 make test
 ```
 
+### Эндпоинты
+- `GET /healthz` — healthcheck endpoint для проверки, что сервис запущен.
+- `POST /graphql` — основной GraphQL endpoint для `query`, `mutation` и `subscription`.
+- `GET /playground` — GraphQL Playground для ручного тестирования API.
+
+Если приложение запущено локально со стандартными настройками, то используются адреса:
+- `http://localhost:8080/healthz`
+- `http://localhost:8080/graphql`
+- `http://localhost:8080/playground`
+
 ### Описание основных операций системы
 Ниже приведён последовательный сценарий, который можно выполнять шаг за шагом для ручной проверки сервиса.
 
