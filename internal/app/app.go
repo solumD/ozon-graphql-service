@@ -9,9 +9,10 @@ import (
 	"time"
 
 	"github.com/solumD/ozon-grapql-service/config"
+	inmemoryBroker "github.com/solumD/ozon-grapql-service/internal/broker/in_memory"
 	graphql "github.com/solumD/ozon-grapql-service/internal/delivery/graphql"
 	"github.com/solumD/ozon-grapql-service/internal/delivery/router"
-	"github.com/solumD/ozon-grapql-service/internal/repository/memory"
+	inmemoryRepo "github.com/solumD/ozon-grapql-service/internal/repository/in_memory"
 	pgrepo "github.com/solumD/ozon-grapql-service/internal/repository/postgres"
 	"github.com/solumD/ozon-grapql-service/internal/usecase"
 	httpserver "github.com/solumD/ozon-grapql-service/pkg/http_server"
@@ -37,6 +38,8 @@ func InitAndRun(ctx context.Context) {
 		commentRepository usecase.CommentRepository
 	)
 
+	commentBroker := inmemoryBroker.NewCommentBroker()
+
 	if cfg.StorageType == config.StorageTypePostgres {
 		postgresConn := pg.New(cfg.PostgresDSN)
 		if err := postgresConn.Ping(ctx); err != nil {
@@ -49,14 +52,14 @@ func InitAndRun(ctx context.Context) {
 		postRepository = pgrepo.NewPostRepository(postgresConn, lg)
 		commentRepository = pgrepo.NewCommentRepository(postgresConn, lg)
 	} else {
-		storage := memory.NewStorage()
-		postRepository = memory.NewPostRepository(storage, lg)
-		commentRepository = memory.NewCommentRepository(storage, lg)
+		storage := inmemoryRepo.NewStorage()
+		postRepository = inmemoryRepo.NewPostRepository(storage, lg)
+		commentRepository = inmemoryRepo.NewCommentRepository(storage, lg)
 	}
 
 	postUsecase := usecase.NewPostUsecase(postRepository, lg)
-	commentUsecase := usecase.NewCommentUsecase(postRepository, commentRepository, lg)
-	resolver := graphql.NewResolver(postUsecase, commentUsecase, lg)
+	commentUsecase := usecase.NewCommentUsecase(postRepository, commentRepository, commentBroker, lg)
+	resolver := graphql.NewResolver(postUsecase, commentUsecase, commentBroker, lg)
 
 	router := router.NewRouter()
 

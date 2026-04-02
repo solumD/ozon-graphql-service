@@ -33,7 +33,7 @@ func (r *commentRepository) Create(ctx context.Context, comment model.Comment) (
 		RETURNING id, created_at
 	`
 
-	log.Debug("exuting query", logger.String("query", query))
+	log.Debug("executing query", logger.String("query", query))
 
 	err := r.db.Pool().QueryRow(ctx, query, comment.UserUUID, comment.PostID, comment.ParentID, comment.Content).
 		Scan(&comment.ID, &comment.CreatedAt)
@@ -62,7 +62,7 @@ func (r *commentRepository) GetByID(ctx context.Context, id int64) (model.Commen
 		WHERE c.id = $1
 	`
 
-	log.Debug("exuting query", logger.String("query", query))
+	log.Debug("executing query", logger.String("query", query))
 
 	var comment model.Comment
 	err := r.db.Pool().QueryRow(ctx, query, id).Scan(
@@ -125,7 +125,7 @@ func (r *commentRepository) ListByPostAndParent(ctx context.Context, filter mode
 		LIMIT $%d
 	`, whereParent, cursorClause, len(args))
 
-	log.Debug("exuting query", logger.String("query", query))
+	log.Debug("executing query", logger.String("query", query))
 
 	rows, err := r.db.Pool().Query(ctx, query, args...)
 	if err != nil {

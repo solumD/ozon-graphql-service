@@ -31,6 +31,8 @@ func TestCreateComment(t *testing.T) {
 		expectedComment   model.Comment
 		expectedError     error
 		expectedPostCalls uint64
+		setupProducer     func(producer *mock.CommentProducerMock)
+		expectedPublishes uint64
 	}{
 		{
 			name:          "empty content",
@@ -61,6 +63,10 @@ func TestCreateComment(t *testing.T) {
 			},
 			expectedComment:   model.Comment{ID: 100, UserUUID: "user-1", PostID: 1, Content: strings.Repeat("a", model.MaxCommentLength)},
 			expectedPostCalls: 1,
+			setupProducer: func(producer *mock.CommentProducerMock) {
+				producer.PublishCommentMock.Expect(minimock.AnyContext, model.Comment{ID: 100, UserUUID: "user-1", PostID: 1, Content: strings.Repeat("a", model.MaxCommentLength)}).Return()
+			},
+			expectedPublishes: 1,
 		},
 		{
 			name:     "post repository error",
@@ -139,6 +145,10 @@ func TestCreateComment(t *testing.T) {
 			},
 			expectedComment:   model.Comment{ID: 101, UserUUID: "user-1", PostID: 5, Content: "content"},
 			expectedPostCalls: 1,
+			setupProducer: func(producer *mock.CommentProducerMock) {
+				producer.PublishCommentMock.Expect(minimock.AnyContext, model.Comment{ID: 101, UserUUID: "user-1", PostID: 5, Content: "content"}).Return()
+			},
+			expectedPublishes: 1,
 		},
 	}
 
@@ -149,6 +159,7 @@ func TestCreateComment(t *testing.T) {
 			mc := minimock.NewController(t)
 			postRepo := mock.NewPostRepositoryMock(mc)
 			commentRepo := mock.NewCommentRepositoryMock(mc)
+			producer := mock.NewCommentProducerMock(mc)
 
 			if tt.setupPostRepo != nil {
 				tt.setupPostRepo(postRepo)
@@ -156,8 +167,11 @@ func TestCreateComment(t *testing.T) {
 			if tt.setupCommentRepo != nil {
 				tt.setupCommentRepo(commentRepo)
 			}
+			if tt.setupProducer != nil {
+				tt.setupProducer(producer)
+			}
 
-			uc := usecase.NewCommentUsecase(postRepo, commentRepo, logger.NewLogger("error"))
+			uc := usecase.NewCommentUsecase(postRepo, commentRepo, producer, logger.NewLogger("error"))
 			comment, err := uc.CreateComment(context.Background(), tt.userUUID, tt.postID, tt.parentID, tt.content)
 
 			if !errors.Is(err, tt.expectedError) {
@@ -176,6 +190,10 @@ func TestCreateComment(t *testing.T) {
 				if got := commentRepo.GetByIDBeforeCounter(); got != 0 {
 					t.Fatalf("expected parent comment lookup not to be called, got %d", got)
 				}
+			}
+
+			if got := producer.PublishCommentBeforeCounter(); got != tt.expectedPublishes {
+				t.Fatalf("expected PublishComment calls %d, got %d", tt.expectedPublishes, got)
 			}
 		})
 	}
@@ -262,7 +280,7 @@ func TestListComments(t *testing.T) {
 				tt.setupCommentRepo(commentRepo)
 			}
 
-			uc := usecase.NewCommentUsecase(postRepo, commentRepo, logger.NewLogger("error"))
+			uc := usecase.NewCommentUsecase(postRepo, commentRepo, nil, logger.NewLogger("error"))
 			connection, err := uc.ListComments(context.Background(), tt.filter)
 
 			if !errors.Is(err, tt.expectedError) {

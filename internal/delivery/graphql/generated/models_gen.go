@@ -45,3 +45,6 @@ type Post struct {
 
 type Query struct {
 }
+
+type Subscription struct {
+}

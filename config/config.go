@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	StorageTypeMemory   = "memory"
+	StorageTypeInMemory = "in_memory"
 	StorageTypePostgres = "postgres"
 )
 
@@ -40,7 +40,7 @@ func MustLoad() *Config {
 
 func (cfg *Config) validate() error {
 	switch cfg.StorageType {
-	case StorageTypeMemory:
+	case StorageTypeInMemory:
 		return nil
 	case StorageTypePostgres:
 		if cfg.PostgresDSN == "" {

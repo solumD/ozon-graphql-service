@@ -11,7 +11,7 @@ import (
 	"github.com/gojuno/minimock/v3"
 	coreerrors "github.com/solumD/ozon-grapql-service/internal/core_errors"
 	graphql "github.com/solumD/ozon-grapql-service/internal/delivery/graphql"
-	"github.com/solumD/ozon-grapql-service/internal/delivery/mock"
+	"github.com/solumD/ozon-grapql-service/internal/delivery/graphql/mock"
 	"github.com/solumD/ozon-grapql-service/internal/model"
 	"github.com/solumD/ozon-grapql-service/pkg/logger"
 )
@@ -73,7 +73,8 @@ func TestCreatePost(t *testing.T) {
 				tt.setupMock(postUC)
 			}
 
-			resolver := graphql.NewResolver(postUC, commentUC, logger.NewLogger("error"))
+			consumer := mock.NewCommentConsumerMock(mc)
+			resolver := graphql.NewResolver(postUC, commentUC, consumer, logger.NewLogger("error"))
 			result, err := resolver.Mutation().CreatePost(context.Background(), tt.userUUID, tt.title, tt.content, tt.commentsOn)
 
 			if !errors.Is(err, tt.expectedError) {
@@ -138,7 +139,8 @@ func TestChangePostCommentsAvailability(t *testing.T) {
 			commentUC := mock.NewCommentUsecaseMock(mc)
 			tt.setupMock(postUC)
 
-			resolver := graphql.NewResolver(postUC, commentUC, logger.NewLogger("error"))
+			consumer := mock.NewCommentConsumerMock(mc)
+			resolver := graphql.NewResolver(postUC, commentUC, consumer, logger.NewLogger("error"))
 			result, err := resolver.Mutation().ChangePostCommentsAvailability(context.Background(), tt.postID, tt.enabled)
 
 			if !errors.Is(err, tt.expectedError) {
@@ -204,7 +206,8 @@ func TestCreateComment(t *testing.T) {
 			commentUC := mock.NewCommentUsecaseMock(mc)
 			tt.setupMock(commentUC)
 
-			resolver := graphql.NewResolver(postUC, commentUC, logger.NewLogger("error"))
+			consumer := mock.NewCommentConsumerMock(mc)
+			resolver := graphql.NewResolver(postUC, commentUC, consumer, logger.NewLogger("error"))
 			result, err := resolver.Mutation().CreateComment(context.Background(), tt.userUUID, tt.postID, tt.parentID, tt.content)
 
 			if !errors.Is(err, tt.expectedError) {
@@ -259,7 +262,8 @@ func TestPosts(t *testing.T) {
 			commentUC := mock.NewCommentUsecaseMock(mc)
 			tt.setupMock(postUC)
 
-			resolver := graphql.NewResolver(postUC, commentUC, logger.NewLogger("error"))
+			consumer := mock.NewCommentConsumerMock(mc)
+			resolver := graphql.NewResolver(postUC, commentUC, consumer, logger.NewLogger("error"))
 			result, err := resolver.Query().Posts(context.Background())
 
 			if !errors.Is(err, tt.expectedError) {
@@ -308,7 +312,8 @@ func TestPost(t *testing.T) {
 			commentUC := mock.NewCommentUsecaseMock(mc)
 			tt.setupMock(postUC)
 
-			resolver := graphql.NewResolver(postUC, commentUC, logger.NewLogger("error"))
+			consumer := mock.NewCommentConsumerMock(mc)
+			resolver := graphql.NewResolver(postUC, commentUC, consumer, logger.NewLogger("error"))
 			result, err := resolver.Query().Post(context.Background(), tt.id)
 
 			if !errors.Is(err, tt.expectedError) {
@@ -415,7 +420,8 @@ func TestComments(t *testing.T) {
 				tt.setupMock(commentUC)
 			}
 
-			resolver := graphql.NewResolver(postUC, commentUC, logger.NewLogger("error"))
+			consumer := mock.NewCommentConsumerMock(mc)
+			resolver := graphql.NewResolver(postUC, commentUC, consumer, logger.NewLogger("error"))
 			result, err := resolver.Query().Comments(context.Background(), tt.postID, tt.parentID, tt.first, tt.after)
 
 			if !errors.Is(err, tt.expectedError) {

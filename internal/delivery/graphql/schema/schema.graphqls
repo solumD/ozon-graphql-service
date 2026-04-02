@@ -12,6 +12,10 @@ type Mutation {
   createComment(userUUID: String!, postID: Int!, parentID: Int, content: String!): Comment!
 }
 
+type Subscription {
+  commentAdded(postID: Int!): Comment!
+}
+
 type Post {
   id: Int!
   userUUID: String!

@@ -18,13 +18,15 @@ import (
 type CommentUsecase struct {
 	postRepository    PostRepository
 	commentRepository CommentRepository
+	commentProducer   CommentProducer
 	log               *slog.Logger
 }
 
-func NewCommentUsecase(postRepository PostRepository, commentRepository CommentRepository, log *slog.Logger) *CommentUsecase {
+func NewCommentUsecase(postRepository PostRepository, commentRepository CommentRepository, commentProducer CommentProducer, log *slog.Logger) *CommentUsecase {
 	return &CommentUsecase{
 		postRepository:    postRepository,
 		commentRepository: commentRepository,
+		commentProducer:   commentProducer,
 		log:               log,
 	}
 }
@@ -91,6 +93,9 @@ func (uc *CommentUsecase) CreateComment(ctx context.Context, userUUID string, po
 	}
 
 	log.Info("comment created in usecase", logger.Int64("comment_id", created.ID), logger.Int64("post_id", created.PostID))
+	if uc.commentProducer != nil {
+		uc.commentProducer.PublishComment(ctx, created)
+	}
 
 	return created, nil
 }

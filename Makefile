@@ -18,7 +18,7 @@ install-deps:
 	GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose@v3.14.0
 
 test:
-	go test ./internal/usecase/tests/... ./internal/delivery/tests/...
+	go test ./internal/usecase/tests/... ./internal/delivery/graphql/tests/...
 
 local-migration-status:
 	${LOCAL_BIN}/goose -dir "${LOCAL_MIGRATION_DIR}" postgres "${LOCAL_MIGRATION_DSN}" status -v

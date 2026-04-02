@@ -17,3 +17,7 @@ type CommentUsecase interface {
 	CreateComment(ctx context.Context, userUUID string, postID int64, parentID *int64, content string) (model.Comment, error)
 	ListComments(ctx context.Context, filter model.CommentListFilter) (model.CommentConnection, error)
 }
+
+type CommentConsumer interface {
+	SubscribeToComments(ctx context.Context, postID int64) <-chan model.Comment
+}

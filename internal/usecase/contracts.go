@@ -18,3 +18,7 @@ type CommentRepository interface {
 	GetByID(ctx context.Context, id int64) (model.Comment, error)
 	ListByPostAndParent(ctx context.Context, filter model.CommentListFilter) ([]model.Comment, bool, error)
 }
+
+type CommentProducer interface {
+	PublishComment(ctx context.Context, comment model.Comment)
+}

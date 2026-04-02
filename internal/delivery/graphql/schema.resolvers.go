@@ -138,11 +138,52 @@ func (r *queryResolver) Comments(ctx context.Context, postID int, parentID *int,
 	return toGraphQLCommentConnection(connection), nil
 }
 
+// CommentAdded is the resolver for the commentAdded field.
+func (r *subscriptionResolver) CommentAdded(ctx context.Context, postID int) (<-chan *generated.Comment, error) {
+	fn := utils.GetCurrentFunctionName()
+	log := r.log.With(logger.String("fn", fn))
+
+	source := r.commentConsumer.SubscribeToComments(ctx, int64(postID))
+	result := make(chan *generated.Comment, 1)
+
+	go func() {
+		defer close(result)
+		for {
+			select {
+			case <-ctx.Done():
+				log.Info("subscription closed", logger.Int64("post_id", int64(postID)))
+
+				return
+			case comment, ok := <-source:
+				if !ok {
+					return
+				}
+
+				mappedComment := toGraphQLComment(comment)
+				select {
+				case result <- mappedComment:
+					log.Info("comment pushed to subscription", logger.Int64("post_id", int64(postID)), logger.Int64("comment_id", comment.ID))
+				case <-ctx.Done():
+					return
+				}
+			}
+		}
+	}()
+
+	log.Info("subscription opened", logger.Int64("post_id", int64(postID)))
+
+	return result, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+// Subscription returns generated.SubscriptionResolver implementation.
+func (r *Resolver) Subscription() generated.SubscriptionResolver { return &subscriptionResolver{r} }
+
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type subscriptionResolver struct{ *Resolver }

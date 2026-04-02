@@ -32,7 +32,7 @@ func (r *postRepository) Create(ctx context.Context, post model.Post) (model.Pos
 		RETURNING id, created_at
 	`
 
-	log.Debug("exuting query", logger.String("query", query))
+	log.Debug("executing query", logger.String("query", query))
 
 	err := r.db.Pool().QueryRow(ctx, query, post.UserUUID, post.Title, post.Content, post.CommentsEnabled).
 		Scan(&post.ID, &post.CreatedAt)
@@ -56,7 +56,7 @@ func (r *postRepository) GetByID(ctx context.Context, id int64) (model.Post, err
 		WHERE id = $1
 	`
 
-	log.Debug("exuting query", logger.String("query", query))
+	log.Debug("executing query", logger.String("query", query))
 
 	var post model.Post
 	err := r.db.Pool().QueryRow(ctx, query, id).Scan(
@@ -92,7 +92,7 @@ func (r *postRepository) List(ctx context.Context) ([]model.Post, error) {
 		ORDER BY created_at ASC, id ASC
 	`
 
-	log.Debug("exuting query", logger.String("query", query))
+	log.Debug("executing query", logger.String("query", query))
 
 	rows, err := r.db.Pool().Query(ctx, query)
 	if err != nil {
@@ -143,7 +143,7 @@ func (r *postRepository) UpdateCommentsAvailability(ctx context.Context, postID 
 		RETURNING id, user_uuid, title, content, comments_enabled, created_at
 	`
 
-	log.Debug("exuting query", logger.String("query", query))
+	log.Debug("executing query", logger.String("query", query))
 
 	var post model.Post
 	err := r.db.Pool().QueryRow(ctx, query, postID, enabled).Scan(
