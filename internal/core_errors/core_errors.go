@@ -3,6 +3,7 @@ package coreerrors
 import "errors"
 
 var (
+	// Ошибки связанные с постами
 	ErrPostNotFound               = errors.New("post not found")
 	ErrCreatePost                 = errors.New("failed to create post")
 	ErrGetPost                    = errors.New("failed to get post")
@@ -12,6 +13,7 @@ var (
 	ErrEmptyPostContent           = errors.New("post content must not be empty")
 	ErrCommentsDisabled           = errors.New("comments are disabled for this post")
 
+	// Ошибки связанные с комментариями
 	ErrCommentNotFound     = errors.New("comment not found")
 	ErrCreateComment       = errors.New("failed to create comment")
 	ErrGetComment          = errors.New("failed to get comment")
@@ -19,6 +21,7 @@ var (
 	ErrCommentTooLong      = errors.New("comment is too long")
 	ErrEmptyCommentContent = errors.New("comment content must not be empty")
 
+	// Ошибки связанные с пагинацией
 	ErrInvalidParentComment = errors.New("parent comment is invalid")
 	ErrInvalidPagination    = errors.New("invalid pagination params")
 	ErrInvalidCursor        = errors.New("invalid pagination cursor")

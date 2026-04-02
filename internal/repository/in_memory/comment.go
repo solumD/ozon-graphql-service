@@ -21,6 +21,7 @@ func NewCommentRepository(storage *Storage, log *slog.Logger) *CommentRepository
 	return &CommentRepository{storage: storage, log: log}
 }
 
+// Create сохраняет комментарии в хранилище
 func (r *CommentRepository) Create(_ context.Context, comment model.Comment) (model.Comment, error) {
 	fn := utils.GetCurrentFunctionName()
 	log := r.log.With(logger.String("fn", fn))
@@ -42,6 +43,7 @@ func (r *CommentRepository) Create(_ context.Context, comment model.Comment) (mo
 
 	r.storage.comments[created.ID] = created
 
+	// создаем отдельный бакет для ответов на комментарий
 	key := r.storage.makeCommentBucketKey(created.PostID, created.ParentID)
 	r.storage.commentsByBucket[key] = append(r.storage.commentsByBucket[key], created.ID)
 
@@ -50,6 +52,7 @@ func (r *CommentRepository) Create(_ context.Context, comment model.Comment) (mo
 	return created, nil
 }
 
+// GetByID возвращает комментарий по его id из хранилища
 func (r *CommentRepository) GetByID(_ context.Context, id int64) (model.Comment, error) {
 	fn := utils.GetCurrentFunctionName()
 	log := r.log.With(logger.String("fn", fn))
@@ -72,6 +75,7 @@ func (r *CommentRepository) GetByID(_ context.Context, id int64) (model.Comment,
 	return comment, nil
 }
 
+// ListByPostAndParent возвращает список комментариев по post_id и parent_id
 func (r *CommentRepository) ListByPostAndParent(_ context.Context, filter model.CommentListFilter) ([]model.Comment, bool, error) {
 	fn := utils.GetCurrentFunctionName()
 	log := r.log.With(logger.String("fn", fn))
@@ -79,6 +83,7 @@ func (r *CommentRepository) ListByPostAndParent(_ context.Context, filter model.
 	r.storage.mu.RLock()
 	defer r.storage.mu.RUnlock()
 
+	// получаем бакет с ответами на комментарий
 	key := r.storage.makeCommentBucketKey(filter.PostID, filter.ParentID)
 	bucket := r.storage.commentsByBucket[key]
 
@@ -137,6 +142,7 @@ func (r *CommentRepository) ListByPostAndParent(_ context.Context, filter model.
 	return comments[startIdx:endIdx], hasNextPage, nil
 }
 
+// hasReplies возвращает true, если у комментария есть дочерние комментарии
 func (r *CommentRepository) hasReplies(postID, commentID int64) bool {
 	key := r.storage.makeCommentBucketKey(postID, &commentID)
 	children := r.storage.commentsByBucket[key]

@@ -21,6 +21,7 @@ func NewPostRepository(storage *Storage, log *slog.Logger) *PostRepository {
 	return &PostRepository{storage: storage, log: log}
 }
 
+// Create сохраняет пост в хранилище
 func (r *PostRepository) Create(_ context.Context, post model.Post) (model.Post, error) {
 	fn := utils.GetCurrentFunctionName()
 	log := r.log.With(logger.String("fn", fn))
@@ -46,6 +47,7 @@ func (r *PostRepository) Create(_ context.Context, post model.Post) (model.Post,
 	return created, nil
 }
 
+// GetByID возвращает пост по его id из хранилища
 func (r *PostRepository) GetByID(_ context.Context, id int64) (model.Post, error) {
 	fn := utils.GetCurrentFunctionName()
 	log := r.log.With(logger.String("fn", fn))
@@ -65,6 +67,7 @@ func (r *PostRepository) GetByID(_ context.Context, id int64) (model.Post, error
 	return post, nil
 }
 
+// List возвращает список постов
 func (r *PostRepository) List(_ context.Context) ([]model.Post, error) {
 	fn := utils.GetCurrentFunctionName()
 	log := r.log.With(logger.String("fn", fn))
@@ -90,6 +93,7 @@ func (r *PostRepository) List(_ context.Context) ([]model.Post, error) {
 	return posts, nil
 }
 
+// UpdateCommentsAvailability обновляет доступность комментариев у поста
 func (r *PostRepository) UpdateCommentsAvailability(_ context.Context, postID int64, enabled bool) (model.Post, error) {
 	fn := utils.GetCurrentFunctionName()
 	log := r.log.With(logger.String("fn", fn))

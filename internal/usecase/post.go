@@ -20,6 +20,7 @@ func NewPostUsecase(postRepository PostRepository, log *slog.Logger) *PostUsecas
 	return &PostUsecase{postRepository: postRepository, log: log}
 }
 
+// CreatePost создает новый пост
 func (uc *PostUsecase) CreatePost(ctx context.Context, userUUID string, title string, content string, commentsEnabled bool) (model.Post, error) {
 	fn := utils.GetCurrentFunctionName()
 	log := uc.log.With(logger.String("fn", fn))
@@ -59,6 +60,7 @@ func (uc *PostUsecase) CreatePost(ctx context.Context, userUUID string, title st
 	return created, nil
 }
 
+// GetPost возвращает пост по id
 func (uc *PostUsecase) GetPost(ctx context.Context, id int64) (model.Post, error) {
 	fn := utils.GetCurrentFunctionName()
 	log := uc.log.With(logger.String("fn", fn))
@@ -75,6 +77,7 @@ func (uc *PostUsecase) GetPost(ctx context.Context, id int64) (model.Post, error
 	return post, nil
 }
 
+// ListPosts возвращает список всех постов
 func (uc *PostUsecase) ListPosts(ctx context.Context) ([]model.Post, error) {
 	fn := utils.GetCurrentFunctionName()
 	log := uc.log.With(logger.String("fn", fn))
@@ -91,6 +94,7 @@ func (uc *PostUsecase) ListPosts(ctx context.Context) ([]model.Post, error) {
 	return posts, nil
 }
 
+// ChangeCommentsAvailability изменяет доступность комментариев у
 func (uc *PostUsecase) ChangeCommentsAvailability(ctx context.Context, postID int64, enabled bool) (model.Post, error) {
 	fn := utils.GetCurrentFunctionName()
 	log := uc.log.With(logger.String("fn", fn))

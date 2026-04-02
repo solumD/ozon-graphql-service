@@ -123,6 +123,7 @@ func (r *queryResolver) Comments(ctx context.Context, postID int, parentID *int,
 			log.Error("failed to decode cursor", logger.Error(err))
 			return nil, err
 		}
+
 		filter.After = &cursor
 	}
 

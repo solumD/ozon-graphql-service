@@ -18,6 +18,7 @@ func NewCommentBroker() *CommentBroker {
 	}
 }
 
+// PublishComment отправляет комментарий всем подписчикам
 func (b *CommentBroker) PublishComment(_ context.Context, comment model.Comment) {
 	b.mu.RLock()
 	subscribers := b.subscribers[comment.PostID]
@@ -35,6 +36,7 @@ func (b *CommentBroker) PublishComment(_ context.Context, comment model.Comment)
 	}
 }
 
+// SubscribeToComments оформляет подписку на комментарии и возвращает канал для их
 func (b *CommentBroker) SubscribeToComments(ctx context.Context, postID int64) <-chan model.Comment {
 	ch := make(chan model.Comment, 1)
 
@@ -53,6 +55,7 @@ func (b *CommentBroker) SubscribeToComments(ctx context.Context, postID int64) <
 	return ch
 }
 
+// unsubscribe удаляет подписку
 func (b *CommentBroker) unsubscribe(postID int64, ch chan model.Comment) {
 	b.mu.Lock()
 	defer b.mu.Unlock()

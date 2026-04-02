@@ -31,6 +31,7 @@ func NewCommentUsecase(postRepository PostRepository, commentRepository CommentR
 	}
 }
 
+// CreateComment создает новый комментарий
 func (uc *CommentUsecase) CreateComment(ctx context.Context, userUUID string, postID int64, parentID *int64, content string) (model.Comment, error) {
 	fn := utils.GetCurrentFunctionName()
 	log := uc.log.With(logger.String("fn", fn))
@@ -63,6 +64,7 @@ func (uc *CommentUsecase) CreateComment(ctx context.Context, userUUID string, po
 		return model.Comment{}, coreerrors.ErrCommentsDisabled
 	}
 
+	// комментарий является ответом на комментарий
 	if parentID != nil {
 		parentComment, err := uc.commentRepository.GetByID(ctx, *parentID)
 		if err != nil {
@@ -94,16 +96,19 @@ func (uc *CommentUsecase) CreateComment(ctx context.Context, userUUID string, po
 
 	log.Info("comment created in usecase", logger.Int64("comment_id", created.ID), logger.Int64("post_id", created.PostID))
 	if uc.commentProducer != nil {
+		// отправляем комментарий подписчикам
 		uc.commentProducer.PublishComment(ctx, created)
 	}
 
 	return created, nil
 }
 
+// ListComments возвращает список комментариев
 func (uc *CommentUsecase) ListComments(ctx context.Context, filter model.CommentListFilter) (model.CommentConnection, error) {
 	fn := utils.GetCurrentFunctionName()
 	log := uc.log.With(logger.String("fn", fn))
 
+	// валидация пагинации
 	normalizedFilter, err := normalizeCommentListFilter(filter)
 	if err != nil {
 		log.Error("failed to normalize comment filter", logger.Error(err))
@@ -120,6 +125,7 @@ func (uc *CommentUsecase) ListComments(ctx context.Context, filter model.Comment
 
 	edges := make([]model.CommentEdge, 0, len(comments))
 	for _, comment := range comments {
+		// генерируем курсор для каждого коммента
 		cursor := encodeCursor(model.Cursor{CreatedAt: comment.CreatedAt, ID: comment.ID})
 		edges = append(edges, model.CommentEdge{
 			Cursor: cursor,
@@ -127,6 +133,7 @@ func (uc *CommentUsecase) ListComments(ctx context.Context, filter model.Comment
 		})
 	}
 
+	// устанавливаем курсор для последнего комментария
 	var endCursor *string
 	if len(edges) > 0 {
 		endCursor = &edges[len(edges)-1].Cursor
@@ -143,6 +150,7 @@ func (uc *CommentUsecase) ListComments(ctx context.Context, filter model.Comment
 	}, nil
 }
 
+// normalizeCommentListFilter валидирует параметры пагинации
 func normalizeCommentListFilter(filter model.CommentListFilter) (model.CommentListFilter, error) {
 	if filter.PostID <= 0 {
 		return model.CommentListFilter{}, coreerrors.ErrInvalidPagination
@@ -159,13 +167,8 @@ func normalizeCommentListFilter(filter model.CommentListFilter) (model.CommentLi
 	return filter, nil
 }
 
-func encodeCursor(cursor model.Cursor) string {
-	raw := fmt.Sprintf("%d:%d", cursor.CreatedAt.UnixNano(), cursor.ID)
-	encoded := base64.StdEncoding.EncodeToString([]byte(raw))
-
-	return encoded
-}
-
+// DecodeCursor декодирует курсор и достает из него
+// время создания и id комментария
 func DecodeCursor(raw string) (model.Cursor, error) {
 	decoded, err := base64.StdEncoding.DecodeString(raw)
 	if err != nil {
@@ -191,4 +194,12 @@ func DecodeCursor(raw string) (model.Cursor, error) {
 		CreatedAt: time.Unix(0, unixNano).UTC(),
 		ID:        id,
 	}, nil
+}
+
+// encodeCursor кодирует курсор
+func encodeCursor(cursor model.Cursor) string {
+	raw := fmt.Sprintf("%d:%d", cursor.CreatedAt.UnixNano(), cursor.ID)
+	encoded := base64.StdEncoding.EncodeToString([]byte(raw))
+
+	return encoded
 }

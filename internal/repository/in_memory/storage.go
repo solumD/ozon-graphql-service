@@ -26,6 +26,7 @@ func NewStorage() *Storage {
 	}
 }
 
+// makeCommentBucketKey возвращает ключ бакета для ответов на комментарий
 func (s *Storage) makeCommentBucketKey(postID int64, parentID *int64) string {
 	if parentID == nil {
 		return fmt.Sprintf("%d:root", postID)

@@ -9,6 +9,8 @@ const (
 	depth = 1
 )
 
+// GetCurrentFunctionName возвращает имя функции/метода,
+// из которой была вызвана
 func GetCurrentFunctionName() string {
 	function, _, _, ok := runtime.Caller(depth)
 	if !ok {

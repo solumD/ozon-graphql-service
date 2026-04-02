@@ -31,6 +31,7 @@ func NewResolver(postUsecase PostUsecase, commentUsecase CommentUsecase, comment
 	}
 }
 
+// RegisterRoutes регистрирует роуты для GraphQL
 func RegisterRoutes(r chi.Router, resolver *Resolver, playgroundEnabled bool) {
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
 	srv.AddTransport(transport.Websocket{

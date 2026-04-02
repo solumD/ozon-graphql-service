@@ -40,6 +40,7 @@ func InitAndRun(ctx context.Context) {
 
 	commentBroker := inmemoryBroker.NewCommentBroker()
 
+	// настройка хранилища
 	if cfg.StorageType == config.StorageTypePostgres {
 		postgresConn := pg.New(cfg.PostgresDSN)
 		if err := postgresConn.Ping(ctx); err != nil {
@@ -70,6 +71,7 @@ func InitAndRun(ctx context.Context) {
 
 	lg.Info("server started", logger.String("addr", cfg.ServerAddr()))
 
+	// graceful shutdown
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 	<-interrupt
