@@ -8,6 +8,9 @@ run:
 	make wait-db
 	make local-migration-up
 
+run-in-memory:
+	STORAGE_TYPE=in_memory PG_DSN= LOCAL_MIGRATION_DSN= docker compose up -d --build --no-deps app
+
 stop:
 	docker compose down
 
