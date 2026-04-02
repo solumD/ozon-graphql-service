@@ -6,10 +6,10 @@ import (
 	"sort"
 	"time"
 
-	coreerrors "github.com/solumD/ozon-grapql-service/internal/core_errors"
-	"github.com/solumD/ozon-grapql-service/internal/model"
-	"github.com/solumD/ozon-grapql-service/internal/utils"
-	"github.com/solumD/ozon-grapql-service/pkg/logger"
+	coreerrors "github.com/solumD/ozon-graphql-service/internal/core_errors"
+	"github.com/solumD/ozon-graphql-service/internal/model"
+	"github.com/solumD/ozon-graphql-service/internal/utils"
+	"github.com/solumD/ozon-graphql-service/pkg/logger"
 )
 
 type CommentRepository struct {

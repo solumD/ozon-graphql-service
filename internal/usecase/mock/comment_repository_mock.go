@@ -2,7 +2,7 @@
 
 package mock
 
-//go:generate minimock -i github.com/solumD/ozon-grapql-service/internal/usecase.CommentRepository -o comment_repository_mock.go -n CommentRepositoryMock -p mock
+//go:generate minimock -i github.com/solumD/ozon-graphql-service/internal/usecase.CommentRepository -o comment_repository_mock.go -n CommentRepositoryMock -p mock
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	mm_time "time"
 
 	"github.com/gojuno/minimock/v3"
-	"github.com/solumD/ozon-grapql-service/internal/model"
+	"github.com/solumD/ozon-graphql-service/internal/model"
 )
 
 // CommentRepositoryMock implements mm_usecase.CommentRepository

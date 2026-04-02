@@ -2,7 +2,7 @@
 
 package mock
 
-//go:generate minimock -i github.com/solumD/ozon-grapql-service/internal/usecase.PostRepository -o post_repository_mock.go -n PostRepositoryMock -p mock
+//go:generate minimock -i github.com/solumD/ozon-graphql-service/internal/usecase.PostRepository -o post_repository_mock.go -n PostRepositoryMock -p mock
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	mm_time "time"
 
 	"github.com/gojuno/minimock/v3"
-	"github.com/solumD/ozon-grapql-service/internal/model"
+	"github.com/solumD/ozon-graphql-service/internal/model"
 )
 
 // PostRepositoryMock implements mm_usecase.PostRepository

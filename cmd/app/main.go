@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	"github.com/solumD/ozon-grapql-service/internal/app"
+	"github.com/solumD/ozon-graphql-service/internal/app"
 )
 
 func main() {

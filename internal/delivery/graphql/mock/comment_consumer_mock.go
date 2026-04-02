@@ -2,7 +2,7 @@
 
 package mock
 
-//go:generate minimock -i github.com/solumD/ozon-grapql-service/internal/delivery/graphql.CommentConsumer -o comment_consumer_mock.go -n CommentConsumerMock -p mock
+//go:generate minimock -i github.com/solumD/ozon-graphql-service/internal/delivery/graphql.CommentConsumer -o comment_consumer_mock.go -n CommentConsumerMock -p mock
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	mm_time "time"
 
 	"github.com/gojuno/minimock/v3"
-	"github.com/solumD/ozon-grapql-service/internal/model"
+	"github.com/solumD/ozon-graphql-service/internal/model"
 )
 
 // CommentConsumerMock implements mm_graphql.CommentConsumer

@@ -7,11 +7,11 @@ import (
 	"log/slog"
 
 	"github.com/jackc/pgx/v5"
-	coreerrors "github.com/solumD/ozon-grapql-service/internal/core_errors"
-	"github.com/solumD/ozon-grapql-service/internal/model"
-	"github.com/solumD/ozon-grapql-service/internal/utils"
-	"github.com/solumD/ozon-grapql-service/pkg/logger"
-	pg "github.com/solumD/ozon-grapql-service/pkg/postgres"
+	coreerrors "github.com/solumD/ozon-graphql-service/internal/core_errors"
+	"github.com/solumD/ozon-graphql-service/internal/model"
+	"github.com/solumD/ozon-graphql-service/internal/utils"
+	"github.com/solumD/ozon-graphql-service/pkg/logger"
+	pg "github.com/solumD/ozon-graphql-service/pkg/postgres"
 )
 
 type commentRepository struct {

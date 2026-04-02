@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/solumD/ozon-grapql-service/internal/model"
+	"github.com/solumD/ozon-graphql-service/internal/model"
 )
 
 type CommentBroker struct {

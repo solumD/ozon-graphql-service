@@ -8,11 +8,11 @@ import (
 	"time"
 
 	"github.com/gojuno/minimock/v3"
-	coreerrors "github.com/solumD/ozon-grapql-service/internal/core_errors"
-	"github.com/solumD/ozon-grapql-service/internal/model"
-	"github.com/solumD/ozon-grapql-service/internal/usecase"
-	"github.com/solumD/ozon-grapql-service/internal/usecase/mock"
-	"github.com/solumD/ozon-grapql-service/pkg/logger"
+	coreerrors "github.com/solumD/ozon-graphql-service/internal/core_errors"
+	"github.com/solumD/ozon-graphql-service/internal/model"
+	"github.com/solumD/ozon-graphql-service/internal/usecase"
+	"github.com/solumD/ozon-graphql-service/internal/usecase/mock"
+	"github.com/solumD/ozon-graphql-service/pkg/logger"
 )
 
 func TestCreateComment(t *testing.T) {

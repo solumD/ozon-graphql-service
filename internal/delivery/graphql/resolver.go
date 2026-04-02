@@ -10,7 +10,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
 	"github.com/gorilla/websocket"
-	"github.com/solumD/ozon-grapql-service/internal/delivery/graphql/generated"
+	"github.com/solumD/ozon-graphql-service/internal/delivery/graphql/generated"
 )
 
 const kapInterval = 10 * time.Second

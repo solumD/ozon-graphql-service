@@ -1,4 +1,4 @@
-module github.com/solumD/ozon-grapql-service
+module github.com/solumD/ozon-graphql-service
 
 go 1.25.8
 

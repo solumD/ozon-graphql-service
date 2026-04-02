@@ -7,11 +7,11 @@ package graphql
 import (
 	"context"
 
-	"github.com/solumD/ozon-grapql-service/internal/delivery/graphql/generated"
-	"github.com/solumD/ozon-grapql-service/internal/model"
-	"github.com/solumD/ozon-grapql-service/internal/usecase"
-	"github.com/solumD/ozon-grapql-service/internal/utils"
-	"github.com/solumD/ozon-grapql-service/pkg/logger"
+	"github.com/solumD/ozon-graphql-service/internal/delivery/graphql/generated"
+	"github.com/solumD/ozon-graphql-service/internal/model"
+	"github.com/solumD/ozon-graphql-service/internal/usecase"
+	"github.com/solumD/ozon-graphql-service/internal/utils"
+	"github.com/solumD/ozon-graphql-service/pkg/logger"
 )
 
 // CreatePost is the resolver for the createPost field.

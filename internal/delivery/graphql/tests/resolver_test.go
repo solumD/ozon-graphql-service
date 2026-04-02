@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/gojuno/minimock/v3"
-	coreerrors "github.com/solumD/ozon-grapql-service/internal/core_errors"
-	graphql "github.com/solumD/ozon-grapql-service/internal/delivery/graphql"
-	"github.com/solumD/ozon-grapql-service/internal/delivery/graphql/mock"
-	"github.com/solumD/ozon-grapql-service/internal/model"
-	"github.com/solumD/ozon-grapql-service/pkg/logger"
+	coreerrors "github.com/solumD/ozon-graphql-service/internal/core_errors"
+	graphql "github.com/solumD/ozon-graphql-service/internal/delivery/graphql"
+	"github.com/solumD/ozon-graphql-service/internal/delivery/graphql/mock"
+	"github.com/solumD/ozon-graphql-service/internal/model"
+	"github.com/solumD/ozon-graphql-service/pkg/logger"
 )
 
 func encodeTestCursor(cursor model.Cursor) string {

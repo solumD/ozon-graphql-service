@@ -8,16 +8,16 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/solumD/ozon-grapql-service/config"
-	inmemoryBroker "github.com/solumD/ozon-grapql-service/internal/broker/in_memory"
-	graphql "github.com/solumD/ozon-grapql-service/internal/delivery/graphql"
-	"github.com/solumD/ozon-grapql-service/internal/delivery/router"
-	inmemoryRepo "github.com/solumD/ozon-grapql-service/internal/repository/in_memory"
-	pgrepo "github.com/solumD/ozon-grapql-service/internal/repository/postgres"
-	"github.com/solumD/ozon-grapql-service/internal/usecase"
-	httpserver "github.com/solumD/ozon-grapql-service/pkg/http_server"
-	"github.com/solumD/ozon-grapql-service/pkg/logger"
-	pg "github.com/solumD/ozon-grapql-service/pkg/postgres"
+	"github.com/solumD/ozon-graphql-service/config"
+	inmemoryBroker "github.com/solumD/ozon-graphql-service/internal/broker/in_memory"
+	graphql "github.com/solumD/ozon-graphql-service/internal/delivery/graphql"
+	"github.com/solumD/ozon-graphql-service/internal/delivery/router"
+	inmemoryRepo "github.com/solumD/ozon-graphql-service/internal/repository/in_memory"
+	pgrepo "github.com/solumD/ozon-graphql-service/internal/repository/postgres"
+	"github.com/solumD/ozon-graphql-service/internal/usecase"
+	httpserver "github.com/solumD/ozon-graphql-service/pkg/http_server"
+	"github.com/solumD/ozon-graphql-service/pkg/logger"
+	pg "github.com/solumD/ozon-graphql-service/pkg/postgres"
 )
 
 const shutdownTimeout = 10 * time.Second

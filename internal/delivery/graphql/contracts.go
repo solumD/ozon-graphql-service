@@ -3,7 +3,7 @@ package graphql
 import (
 	"context"
 
-	"github.com/solumD/ozon-grapql-service/internal/model"
+	"github.com/solumD/ozon-graphql-service/internal/model"
 )
 
 type PostUsecase interface {

@@ -1,9 +1,9 @@
 package graphql
 
 import (
-	"github.com/solumD/ozon-grapql-service/internal/delivery/graphql/generated"
-	"github.com/solumD/ozon-grapql-service/internal/model"
-	"github.com/solumD/ozon-grapql-service/internal/utils"
+	"github.com/solumD/ozon-graphql-service/internal/delivery/graphql/generated"
+	"github.com/solumD/ozon-graphql-service/internal/model"
+	"github.com/solumD/ozon-graphql-service/internal/utils"
 )
 
 func toGraphQLPost(post model.Post) *generated.Post {
